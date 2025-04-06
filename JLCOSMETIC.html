@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>퍼스널컬러 AI 체험</title>
+  <style>
+    body {
+      font-family: 'Apple SD Gothic Neo', sans-serif;
+      background-color: #FFFBFB;
+      margin: 0;
+      padding: 0;
+      color: #333;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      text-align: center;
+      padding: 2rem;
+    }
+    .main-image {
+      width: 100%;
+      max-height: 500px;
+      object-fit: cover;
+      border-radius: 12px;
+    }
+    h1 {
+      color: #D38585;
+      font-size: 2rem;
+      margin-top: 1.5rem;
+    }
+    button {
+      background-color: #F9EAEA;
+      border: none;
+      padding: 1rem 2rem;
+      font-size: 1rem;
+      cursor: pointer;
+      border-radius: 8px;
+      margin: 0.5rem;
+      transition: background-color 0.3s ease;
+    }
+    button:hover {
+      background-color: #eacfcf;
+    }
+    .form-section, .result-section, .loading-section {
+      display: none;
+      margin-top: 2rem;
+      animation: fadeIn 1s ease forwards;
+    }
+    input {
+      margin: 0.5rem;
+      padding: 0.5rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      width: 80px;
+    }
+    .product {
+      margin: 1rem auto;
+      border: 1px solid #eee;
+      border-radius: 12px;
+      padding: 1rem;
+      max-width: 500px;
+      background-color: #fff;
+    }
+    .product img {
+      width: 100%;
+      border-radius: 12px;
+    }
+    .lang-switcher {
+      margin-top: 1rem;
+    }
+    .action-buttons {
+      margin-top: 2rem;
+    }
+    .action-buttons button {
+      margin: 0.5rem;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <img src="메크쏘울.jpg" alt="메크쏘울" class="main-image">
+
+    <div class="lang-switcher">
+      <button onclick="setLanguage('ko')">한국어</button>
+      <button onclick="setLanguage('en')">English</button>
+      <button onclick="setLanguage('ja')">日本語</button>
+      <button onclick="setLanguage('vi')">Tiếng Việt</button>
+    </div>
+
+    <h1 id="mainTitle">나에게 어울리는 퍼스널컬러, 지금 확인해보세요!</h1>
+    <button onclick="startTest()" id="startBtn">퍼스널컬러 확인하기</button>
+
+    <div class="form-section" id="formSection">
+      <h2 id="formTitle">기기에 표시된 L, a, b 값을 입력해 주세요</h2>
+
+      <div>
+        <h3 id="skinTitle">피부 타입 측정하기</h3>
+        L: <input type="number" id="skinL" placeholder="0~100">
+        a: <input type="number" id="skinA" placeholder="-128~127">
+        b: <input type="number" id="skinB" placeholder="-128~127">
+      </div>
+      <div>
+        <h3 id="lipTitle">입술 색 측정하기</h3>
+        L: <input type="number" id="lipL" placeholder="0~100">
+        a: <input type="number" id="lipA" placeholder="-128~127">
+        b: <input type="number" id="lipB" placeholder="-128~127">
+      </div>
+      <button onclick="startDiagnosis()" id="diagnoseBtn">진단하기</button>
+    </div>
+
+    <div class="loading-section" id="loadingSection">
+      <h2 id="loadingText">당신에게 어울리는 컬러를 분석 중입니다...</h2>
+    </div>
+
+    <div class="result-section" id="resultSection">
+      <h2 id="resultTitle">퍼스널컬러 진단 결과</h2>
+      <p id="skinResult"></p>
+      <p id="lipResult"></p>
+
+      <div class="product">
+        <h3 id="productTitle">MAKE SOUL의 추천 제품</h3>
+        <img id="lipCheekImg" src="립앤치크.jpg" alt="립앤치크">
+        <p id="lipCheekResult"></p>
+      </div>
+      <div class="product">
+        <img id="tintImg" src="벨벳틴트.jpg" alt="벨벳틴트">
+        <p id="tintResult"></p>
+      </div>
+      <div class="product">
+        <h4 id="tipTitle">추천 화장법</h4>
+        <p id="makeupTip"></p>
+      </div>
+
+      <div class="action-buttons">
+        <button onclick="alert('이후 연결 예정입니다')">해당 제품 구매하기</button>
+        <button onclick="alert('이후 연결 예정입니다')">다른 제품 구경하기</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function startTest() {
+      document.getElementById('formSection').style.display = 'block';
+    }
+
+    function startDiagnosis() {
+      document.getElementById('formSection').style.display = 'none';
+      document.getElementById('loadingSection').style.display = 'block';
+
+      setTimeout(() => {
+        document.getElementById('loadingSection').style.display = 'none';
+        document.getElementById('resultSection').style.display = 'block';
+
+        const skinL = Number(document.getElementById('skinL').value);
+        const skinA = Number(document.getElementById('skinA').value);
+        const skinB = Number(document.getElementById('skinB').value);
+        const lipL = Number(document.getElementById('lipL').value);
+        const lipA = Number(document.getElementById('lipA').value);
+        const lipB = Number(document.getElementById('lipB').value);
+
+        let skinTone = '';
+        if (skinL > 60 && skinA > 0 && skinB > 0) skinTone = '봄 웜';
+        else if (skinL > 60 && skinA > 0 && skinB < 0) skinTone = '여름 쿨';
+        else if (skinL <= 60 && skinA > 0 && skinB > 0) skinTone = '가을 웜';
+        else skinTone = '겨울 쿨';
+
+        let lipTone = '';
+        if (lipL >= 40 && lipL <= 70 && lipA >= 0 && lipA <= 40 && lipB > 0) lipTone = '봄 웜';
+        else if (lipL >= 60 && lipA <= 30 && lipB < 0) lipTone = '여름 쿨';
+        else if (lipL < 40 && lipA > 0 && lipB > 0) lipTone = '가을 웜';
+        else lipTone = '겨울 쿨';
+
+        document.getElementById('skinResult').innerText = `피부 타입: ${skinTone}`;
+        document.getElementById('lipResult').innerText = `입술 타입: ${lipTone}`;
+
+        const isWarm = (skinTone.includes('웜') && lipTone.includes('웜'));
+        const isCool = (skinTone.includes('쿨') && lipTone.includes('쿨'));
+        const isNeutral = !isWarm && !isCool;
+        const isBright = skinL > 60;
+
+        let lipCheekMain = '', lipCheekCandidates = [], tintMain = '', tintCandidates = [], tip = '';
+
+        if (isWarm) {
+          lipCheekMain = '01 쉿! 코랄헤이즈';
+          lipCheekCandidates = ['02 생기발랄 캔디레드', '03 메모리 코랄로즈', '12 발레리나'];
+          tintMain = isBright ? '06 텐더 베이지' : '03 센슈얼 레드';
+          tintCandidates = isBright ? ['05 티파니 & 피치허니', '03 센슈얼 레드'] : ['06 텐더 베이지', '04 데이 코랄 무드'];
+          tip = '웜톤에는 코랄과 브라운 계열이 잘 어울립니다. 자연스럽고 따뜻한 인상을 줄 수 있는 메이크업을 추천해요!';
+        } else if (isCool) {
+          lipCheekMain = '04 어썸 베이비 핑크';
+          lipCheekCandidates = ['05 힙 플럼 핑크', '06 시그니처 쏘울레드', '07 애쉬 퍼플'];
+          tintMain = isBright ? '02 더 파티' : '01 시그니처 쏘울 레드';
+          tintCandidates = isBright ? ['01 시그니처 쏘울 레드', '06 텐더 베이지'] : ['02 더 파티', '04 데이 코랄 무드'];
+          tip = '쿨톤에는 핑크와 플럼 계열이 잘 어울립니다. 생기 있고 선명한 컬러감으로 맑은 분위기를 연출해보세요!';
+        } else {
+          lipCheekMain = '08 모브 핑크 누디';
+          lipCheekCandidates = ['09 루나 핑크 누디', '10 어반 디어 로즈', '11 미드나잇 로즈우드'];
+          tintMain = isBright ? '05 티파니 & 피치허니' : '04 데이 코랄 무드';
+          tintCandidates = isBright ? ['06 텐더 베이지', '02 더 파티'] : ['01 시그니처 쏘울 레드', '03 센슈얼 레드'];
+          tip = '뉴트럴톤은 웜/쿨의 중간 영역을 커버합니다. 모브, 로즈 계열로 차분하면서도 세련된 룩을 추천드려요!';
+        }
+
+        document.getElementById('lipCheekResult').innerText = `추천: ${lipCheekMain}\n후보: ${lipCheekCandidates.join(', ')}`;
+        document.getElementById('tintResult').innerText = `추천: ${tintMain}\n후보: ${tintCandidates.join(', ')}`;
+        document.getElementById('makeupTip').innerText = tip;
+      }, 3000);
+    }
+
+    function setLanguage(lang) {
+      const translations = {
+        mainTitle: {
+          ko: "나에게 어울리는 퍼스널컬러, 지금 확인해보세요!",
+          en: "Discover Your Personal Color Now!",
+          ja: "あなたに似合うパーソナルカラーを今すぐチェック！",
+          vi: "Khám phá màu sắc phù hợp với bạn ngay bây giờ!"
+        },
+        startBtn: {
+          ko: "퍼스널컬러 확인하기",
+          en: "Start Your Color Test",
+          ja: "パーソナルカラーを確認する",
+          vi: "Bắt đầu kiểm tra màu sắc"
+        },
+        formTitle: {
+          ko: "기기에 표시된 L, a, b 값을 입력해 주세요",
+          en: "Please enter the L, a, b values shown on the device",
+          ja: "デバイスに表示されたL、a、bの値を入力してください",
+          vi: "Vui lòng nhập giá trị L, a, b từ thiết bị"
+        },
+        skinTitle: {
+          ko: "피부 타입 측정하기",
+          en: "Measure Skin Tone",
+          ja: "肌のタイプを測定する",
+          vi: "Đo màu da"
+        },
+        lipTitle: {
+          ko: "입술 색 측정하기",
+          en: "Measure Lip Color",
+          ja: "唇の色を測定する",
+          vi: "Đo màu môi"
+        },
+        diagnoseBtn: {
+          ko: "진단하기",
+          en: "Diagnose",
+          ja: "診断する",
+          vi: "Phân tích"
+        },
+        loadingText: {
+          ko: "당신에게 어울리는 컬러를 분석 중입니다...",
+          en: "Analyzing the best color for you...",
+          ja: "あなたに似合う色を分析中...",
+          vi: "Đang phân tích màu sắc phù hợp với bạn..."
+        },
+        resultTitle: {
+          ko: "퍼스널컬러 진단 결과",
+          en: "Your Personal Color Result",
+          ja: "パーソナルカラー診断結果",
+          vi: "Kết quả màu sắc cá nhân của bạn"
+        },
+        productTitle: {
+          ko: "MAKE SOUL의 추천 제품",
+          en: "Recommended Products from MAKE SOUL",
+          ja: "MAKE SOULのおすすめ製品",
+          vi: "Sản phẩm gợi ý từ MAKE SOUL"
+        },
+        tipTitle: {
+          ko: "추천 화장법",
+          en: "Recommended Makeup Tip",
+          ja: "おすすめメイク方法",
+          vi: "Gợi ý cách trang điểm"
+        }
+      };
+
+      for (let id in translations) {
+        const el = document.getElementById(id);
+        if (el) el.innerText = translations[id][lang];
+      }
+    }
+  </script>
+</body>
+</html>
